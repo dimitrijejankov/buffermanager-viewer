@@ -50,12 +50,17 @@ function loadMe() {
 
         var replacementSwitch = $("#timeline-select" )
         for(t in timelinePoints) {
-            replacementSwitch.append($('<option value="' + timelinePoints[t] +'">Snapshot ' + timelinePoints[t] + '</option>'))
+            replacementSwitch.append($('<option value="' + t +'">Snapshot ' + timelinePoints[t] + '</option>'))
         }
         
         replacementSwitch.show();
         replacementSwitch.chosen({}).change( function(obj, result) {
-            drawMemory(timeline, result.selected);
+
+            // set the timepoint
+            currentTimepoint = Number(result.selected);
+
+            // update ui
+            drawMemory(timeline, timelinePoints[currentTimepoint]);
         });
 
         $("#button-first").click(function(){
