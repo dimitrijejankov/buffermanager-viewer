@@ -1,17 +1,31 @@
 <html>
 <head>
   <title>Viewer</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.min.css">
+
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script type="text/javascript" src="./parse-timeline.js"></script>
+	<script type="text/javascript" src="./render-timeline.js"></script>
 	<script type="text/javascript" src="./load-page.js"></script>
 </head>
 <body>
 
+	<!-- the current state of the buffer manager -->
+	<div id="chart_div" style="width: 900px; height: 500px;"></div>
+
 	<!-- the open buttton -->
 	<input id="browseOpen" type="file"/>
 
-	<!-- the current state of the buffer manager -->
-	<div id="chart_div" style="width: 900px; height: 500px;"></div>
+	<!-- This is the timeline -->
+	<select id="timeline-select" hidden="true" data-placeholder="Choose a Snapshot..." class="chosen-select" tabindex="1"></select>
+	
+	<button id="button-first">First</button>
+	<button id="button-previous">Previous</button>
+	<button id="button-next">Next</button>
+	<button id="button-last">Last</button>
+
 </body>
 
 </html>
