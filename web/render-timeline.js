@@ -1,4 +1,4 @@
-function drawMemory(timeline, i) {
+function drawMemory(timeline, symbols, traces, i) {
 
     var arrayData = [['Page', 'Parent', 'Size', 'Used'],
                      ['Memory', null, Number(timeline.numberOfPages * timeline.pageSize), null]];
@@ -114,10 +114,25 @@ function drawMemory(timeline, i) {
 
     var options = { highlightOnMouseOver: true,
                     maxDepth: 1,
+                    minColorValue: -1,
+                    maxColorValue: 1,
                     maxPostDepth: 2,
                     headerHeight: 15,
                     height: 500,
                     useWeightedAverageForAggregation: true };
 
     tree.draw(data, options);
+
+    // check if we have the traces and symbols
+    if(traces != null && symbols != null) {
+        // get the trace
+        var trace = traces[i];
+
+        // match the trace to a symbol
+        var symbol = symbols[trace.traceID];
+
+        // finished parsing
+        var text = symbol.description.replace(/\n/g, "<br />")
+        $("#stackTrace").html(text);
+    }
 }

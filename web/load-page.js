@@ -3,12 +3,15 @@ function loadMe() {
 
     var timeline;
     var timelinePoints = [];
-    var fileInput = document.getElementById('browseOpen');
-    var fReader = new FileReader();
+    var symbols = null;
+    var traces = null;
     
     google.charts.load('current', {'packages':['treemap']});
 
-    fReader.onload = function(e) {
+    // init the timeline file loading
+    var timelineFileInput = document.getElementById('openTimeline');
+    var timeLineReader = new FileReader();
+    timeLineReader.onload = function(e) {
 
         // grab the byte array
         var byteArray = e.target.result
@@ -17,18 +20,66 @@ function loadMe() {
         timeline = parseTimeline(byteArray);
 
         // finished parsing
-        console.log("Finished parsing");
+        console.log("Timeline parsing finished");
 
         // draw the chart
         drawChart(timeline);
 
         // hide the file chooser
-        $("#browseOpen").hide();
+        $("#openTimelineGroup").hide();
+        $("#openSymbolsGroup").show();
     }
     
-    fileInput.onchange = function(e) {
+    timelineFileInput.onchange = function(e) {
         var file = this.files[0];
-        fReader.readAsArrayBuffer(file);
+        timeLineReader.readAsArrayBuffer(file);
+    }
+
+    // init the symbol file loading
+    var symbolsFileInput = document.getElementById('openSymbols');
+    var symbolsReader = new FileReader();
+    symbolsReader.onload = function(e) {
+
+        // grab the byte array
+        var byteArray = e.target.result
+
+        // parse the symbols
+        symbols = parseSymbols(byteArray);
+
+        // finished parsing
+        console.log("Symbols parsing finished");
+
+        // hide the file chooser
+        $("#openSymbolsGroup").hide();
+        $("#openStackTracesGroup").show();
+    }
+
+    symbolsFileInput.onchange = function(e) {
+        var file = this.files[0];
+        symbolsReader.readAsArrayBuffer(file);
+    }
+
+    // init the traces
+    var tracesFileInput = document.getElementById('openStackTraces');
+    var tracesReader = new FileReader();
+    tracesReader.onload = function(e) {
+
+        // grab the byte array
+        var byteArray = e.target.result
+
+        // load the traces
+        traces = parseTraces(byteArray);
+
+        // finished parsing
+        console.log("Traces parsing finished");
+
+        // hide the file chooser
+        $("#openStackTracesGroup").hide();
+    }
+
+    tracesFileInput.onchange = function(e) {
+        var file = this.files[0];
+        tracesReader.readAsArrayBuffer(file);
     }
 
     google.charts.load("current", {packages:["timeline"]});
@@ -46,7 +97,7 @@ function loadMe() {
         timelinePoints.sort(function(a, b){return a-b});
 
         // render the first map
-        drawMemory(timeline, timelinePoints[currentTimepoint]);
+        drawMemory(timeline, symbols, traces, timelinePoints[currentTimepoint]);
 
         var replacementSwitch = $("#timeline-select" )
         for(t in timelinePoints) {
@@ -55,7 +106,7 @@ function loadMe() {
         
         replacementSwitch.show();
         replacementSwitch.chosen({}).change( function(obj, result) {
-            drawMemory(timeline, result.selected);
+            drawMemory(timeline, symbols, traces, result.selected);
         });
 
         $("#button-first").click(function(){
@@ -66,7 +117,7 @@ function loadMe() {
             // update ui
             replacementSwitch.val(timelinePoints[currentTimepoint]);
             replacementSwitch.trigger("chosen:updated");
-            drawMemory(timeline, timelinePoints[currentTimepoint]);
+            drawMemory(timeline, symbols, traces, timelinePoints[currentTimepoint]);
         }); 
 
         $("#button-next").click(function(){
@@ -78,7 +129,7 @@ function loadMe() {
             // update ui
             replacementSwitch.val(timelinePoints[currentTimepoint]);
             replacementSwitch.trigger("chosen:updated");
-            drawMemory(timeline, timelinePoints[currentTimepoint]);
+            drawMemory(timeline, symbols, traces, timelinePoints[currentTimepoint]);
         }); 
 
         $("#button-previous").click(function(){
@@ -90,7 +141,7 @@ function loadMe() {
             // update ui
             replacementSwitch.val(timelinePoints[currentTimepoint]);
             replacementSwitch.trigger("chosen:updated");
-            drawMemory(timeline, timelinePoints[currentTimepoint]);
+            drawMemory(timeline, symbols, traces, timelinePoints[currentTimepoint]);
         }); 
 
         $("#button-last").click(function(){
@@ -101,7 +152,7 @@ function loadMe() {
             // update ui
             replacementSwitch.val(timelinePoints[currentTimepoint]);
             replacementSwitch.trigger("chosen:updated");
-            drawMemory(timeline, timelinePoints[currentTimepoint]);
+            drawMemory(timeline, symbols, traces, timelinePoints[currentTimepoint]);
         }); 
     }
 }

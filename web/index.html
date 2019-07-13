@@ -16,8 +16,21 @@
 	<div id="chart_div" style="width: 900px; height: 500px;"></div>
 
 	<!-- the open buttton -->
-	<input id="browseOpen" type="file"/>
+	<span id="openTimelineGroup">
+		<label for="openTimeline">Open Timeline</label>
+		<input id="openTimeline" name="openTimeline" type="file" accept=".dt" />
+	</span>
 
+	<span id="openSymbolsGroup" hidden="true">
+		<label for="openSymbols">Open Symbols</label>
+		<input id="openSymbols" name="openSymbols" type="file" accept=".ds"/>
+	</span>
+	
+	<span id="openStackTracesGroup" hidden="true">
+		<label for="openStackTraces">Open Symbols</label>
+		<input id="openStackTraces" name="openStackTraces" type="file" accept=".dst"/>
+	</span>
+	
 	<!-- This is the timeline -->
 	<select id="timeline-select" hidden="true" data-placeholder="Choose a Snapshot..." class="chosen-select" tabindex="1"></select>
 	
@@ -26,6 +39,8 @@
 	<button id="button-next">Next</button>
 	<button id="button-last">Last</button>
 
+	<!--This is the stack trace-->
+	<div id="stackTrace"></div>
 </body>
 
 </html>
