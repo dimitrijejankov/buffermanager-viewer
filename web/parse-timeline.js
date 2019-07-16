@@ -31,7 +31,9 @@ function parseTimeline(byteArray) {
     // skip the first three numbers
     byteOffset += 3 * 8
 
-    var timeline = { "pageSize" : pageSize, "numberOfPages" : numberOfPages, "snapshots" : {} };
+    var timeline = { "pageSize" : pageSize, 
+                     "numberOfPages" : numberOfPages, 
+                     "snapshots" : {} };
 
     while(byteView.byteLength != byteOffset) {
         
@@ -157,7 +159,9 @@ function parseSymbols(byteArray) {
         byteOffset += Number(descriptionLength);
 
         // store the symbol
-        symbols[id] = { "id" : id, "traceAddresses" : traceAddresses, "description" : description };
+        symbols[id] = { "id" : id, 
+                        "traceAddresses" : traceAddresses, 
+                        "description" : description };
     }
 
     return symbols;
@@ -213,8 +217,83 @@ function parseTraces(byteArray) {
         var value = byteView.getBigUint64(byteOffset, true);
         byteOffset += 8;
 
+        // read the backend timestamp
+        var backendTimestamp = byteView.getBigUint64(byteOffset, true);
+        byteOffset += 8;
+
         // store the trace
-        traces[timestamp] = { "timestamp" : timestamp, "traceID" : traceID, "op" : op, "dbName" : dbName, "setName" : setName, "pageNumber" : pageNumber, "value" : value };
+        traces[String(timestamp)] = { "timestamp" : timestamp, 
+                                      "traceID" : traceID, 
+                                      "op" : op, 
+                                      "dbName" : dbName, 
+                                      "setName" : setName, 
+                                      "pageNumber" : pageNumber, 
+                                      "value" : value, 
+                                      "backendTimestamp" : backendTimestamp };
+    }
+
+    // return traces
+    return traces;
+}
+
+function parseBackendTraces(byteArray) {
+
+    // byte array
+    var byteView = new DataView(byteArray)
+    
+    // the offset
+    var byteOffset = 0;
+
+    // we put our traces to
+    traces = {};
+
+    // scan the file
+    while(byteView.byteLength != byteOffset) {
+
+        // read the timestamp
+        var timestamp = byteView.getBigUint64(byteOffset, true);
+        byteOffset += 8;
+
+        // read the traceID
+        var traceID = byteView.getBigUint64(byteOffset, true);
+        byteOffset += 8;
+
+        // read the operation
+        var op = byteView.getBigUint64(byteOffset, true);
+        byteOffset += 8;
+
+        // read in the size of the database name
+        var dbNameSize = byteView.getBigUint64(byteOffset, true);
+        byteOffset += 8;
+        
+        // read in a string (this is actually very painful to see so inefficient)
+        var dbName = bin2String(byteView, byteOffset, dbNameSize);
+        byteOffset += Number(dbNameSize);
+
+        // read in the size of the database name
+        var setNameSize = byteView.getBigUint64(byteOffset, true);
+        byteOffset += Number(8);
+        
+        // read in a string (this is actually very painful to see so inefficient)
+        var setName = bin2String(byteView, byteOffset, setNameSize);
+        byteOffset += Number(setNameSize);
+
+        // read the pageNumber
+        var pageNumber = byteView.getBigUint64(byteOffset, true);
+        byteOffset += 8;
+
+        // read the value
+        var value = byteView.getBigUint64(byteOffset, true);
+        byteOffset += 8;
+
+        // store the trace
+        traces[String(timestamp)] = { "timestamp" : timestamp, 
+                                      "traceID" : traceID, 
+                                      "op" : op, 
+                                      "dbName" : dbName, 
+                                      "setName" : setName, 
+                                      "pageNumber" : pageNumber, 
+                                      "value" : value };
     }
 
     // return traces

@@ -1,4 +1,34 @@
-function drawMemory(timeline, symbols, traces, i) {
+
+// the labels for the frontend ops
+var frontendTraceOps = 
+{ 
+    0 : "Get page", 
+    1 : "Freeze",
+    2 : "Unpin",
+    3 : "Repin",
+    4 : "Free",
+    5 : "Clear",
+    6 : "Forward",
+    7 : "Handle Pin",
+    8 : "Handle Freeze",
+    9 : "Handle Return",
+    10 : "Handle Get",
+    11 : "Handle Unpin" 
+};
+
+// the label for the backend ops
+var backendTracOps = 
+{
+    0 : "Get page",
+    1 : "Freeze",
+    2 : "Unpin",
+    3 : "Repin",
+    4 : "Free",
+    5 : "Clear",
+    6 : "Expect"
+};
+
+function drawMemory(timeline, symbols, traces, backendSymbols, backendTraces, i) {
 
     var arrayData = [['Page', 'Parent', 'Size', 'Used'],
                      ['Memory', null, Number(timeline.numberOfPages * timeline.pageSize), null]];
@@ -125,14 +155,30 @@ function drawMemory(timeline, symbols, traces, i) {
 
     // check if we have the traces and symbols
     if(traces != null && symbols != null) {
+
         // get the trace
         var trace = traces[i];
 
-        // match the trace to a symbol
-        var symbol = symbols[trace.traceID];
+        // do we have a backend trace
+        if(trace.op >= 6 && backendTraces != null && backendSymbols != null) {
+        
+            // get the backend trace
+            var backendTrace = backendTraces[String(trace.backendTimestamp)];
 
-        // finished parsing
-        var text = symbol.description.replace(/\n/g, "<br />")
-        $("#stackTrace").html(text);
+            // get the backend symbol
+            var symbol = backendSymbols[backendTrace.traceID];
+
+            // finished parsing
+            var text = symbol.description.replace(/\n/g, "<br />")
+            $("#stackTrace").html(text);
+        }
+        else {
+            // match the trace to a symbol
+            var symbol = symbols[String(trace.traceID)];
+
+            // finished parsing
+            var text = symbol.description.replace(/\n/g, "<br />")
+            $("#stackTrace").html(text);
+        }
     }
 }
